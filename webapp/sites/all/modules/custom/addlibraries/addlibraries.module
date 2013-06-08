@@ -1,0 +1,29 @@
+<?php
+// Implements hook_library() for additional required library
+function addlibraries_library () {
+
+    $libraries = array();
+
+    $libraries['d3.v3'] = array(
+        'title'   => 'D3.js',
+        'website' => 'http://d3js.org',
+        'version' => 'v3',
+        'js' => array(
+            'sites/all/libraries/d3.v3/d3.v3.min.js' => array('weight' => 1) // !important weight
+        )
+    );
+
+    $libraries['jQueryUI_1.9'] = array(
+        'title'   => 'jQuery-UI',
+        'website' => 'http://jqueryui.com',
+        'version' => '1.9',
+        'js' => array(
+            'sites/all/libraries/jquery-ui/jquery-ui.min.js' => array('weight' => 1) // !important weight
+        ),
+        'css' => array (
+            'sites/all/libraries/jquery-ui/css/ui-lightness/jquery-ui.css' => array()
+        )
+    );
+
+    return $libraries;
+}

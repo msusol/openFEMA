@@ -1,0 +1,7 @@
+name = OpenFEMA
+description = Fire Data Visualization
+package = OpenFema
+version = 7.x-1.0
+core = 7.x
+
+dependencies[]= addlibraries

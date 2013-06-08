@@ -1,0 +1,8 @@
+name = Add Libraries
+description = adds additional libraries
+package = OpenFema
+version = 7.x-1.0
+core = 7.x
+
+dependencies[]= jquery_update
+dependencies[]= libraries
