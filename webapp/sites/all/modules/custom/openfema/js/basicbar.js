@@ -23,7 +23,7 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.tsv(openfema.d_path + "data.tsv", type, function(error, data) {
+    d3.tsv(openfema.data_path + "data.tsv", type, function(error, data) {
         x.domain(d3.extent(data, function(d) { return d.value; })).nice();
         y.domain(data.map(function(d) { return d.name; }));
 

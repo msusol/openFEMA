@@ -19,8 +19,8 @@
         .attr("height", height);
 
     queue()
-        .defer(d3.json, openfema.d_path + "us.json")
-        .defer(d3.tsv, openfema.d_path + "unemployment.tsv", function(d) { rateById.set(d.id, +d.rate); })
+        .defer(d3.json, openfema.data_path + "us.json")
+        .defer(d3.tsv, openfema.data_path + "unemployment.tsv", function(d) { rateById.set(d.id, +d.rate); })
         .await(ready);
 
     function ready(error, us) {

@@ -9,7 +9,9 @@ function addlibraries_library () {
         'website' => 'http://d3js.org',
         'version' => 'v3',
         'js' => array(
-            'sites/all/libraries/d3.v3/d3.v3.min.js' => array('weight' => 1) // !important weight
+            'sites/all/libraries/d3.v3/d3.v3.min.js'        => array('weight' => 1), // !important weight
+            'sites/all/libraries/d3.v3/queue.v1.min.js'     => array('weight' => 1),
+            'sites/all/libraries/d3.v3/topojson.v1.min.js'  => array('weight' => 1)
         )
     );
 

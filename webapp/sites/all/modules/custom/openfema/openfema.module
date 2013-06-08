@@ -21,6 +21,13 @@ function openfema_menu () {
         'type' => MENU_NORMAL_ITEM
     );
 
+    $items['vis_3'] = array(
+        'title' => 'KY Zip',
+        'page callback' => 'openfema_ky_zip',
+        'access callback' => TRUE,
+        'type' => MENU_NORMAL_ITEM
+    );
+
     return $items;
 }
 
@@ -30,7 +37,7 @@ function openfema_chlorepeth() {
 
     // pass data to javascript
     $add_js = array();
-    $add_js['openfema'] = array('d_path' => $path.'/d/');
+    $add_js['openfema'] = array('data_path' => $path.'/data/');
 
     drupal_add_js($add_js, 'setting');
 
@@ -38,12 +45,10 @@ function openfema_chlorepeth() {
     drupal_add_library('addlibraries','d3.v3');
     drupal_add_library('addlibraries','jQueryUI_1.9');
 
-    drupal_add_css($path.'/css/style.css');
-    drupal_add_js($path.'/js/queue.v1.min.js');
-    drupal_add_js($path.'/js/topojson.v1.min.js');
+    drupal_add_css($path.'/css/chlorepeth.css');
     drupal_add_js($path.'/js/chlorepeth.js',   array('scope' => 'footer'));
 
-    $content = '<container></container>';
+    $content = file_get_contents($path.'/html/chlorepeth.html');
 
     return $content;
 }
@@ -54,7 +59,7 @@ function openfema_basic_bar() {
 
     // pass data to javascript
     $add_js = array();
-    $add_js['openfema'] = array('d_path' => $path.'/d/');
+    $add_js['openfema'] = array('data_path' => $path.'/data/');
 
     drupal_add_js($add_js, 'setting');
 
@@ -62,10 +67,32 @@ function openfema_basic_bar() {
     drupal_add_library('addlibraries','d3.v3');
     drupal_add_library('addlibraries','jQueryUI_1.9');
 
-    drupal_add_css($path.'/css/style.css');
+    drupal_add_css($path.'/css/basicbar.css');
     drupal_add_js($path.'/js/basicbar.js',   array('scope' => 'footer'));
 
-    $content = '<container></container>';
+    $content = file_get_contents($path.'/html/basicbar.html');
+
+    return $content;
+}
+
+function openfema_ky_zip() {
+
+    $path = drupal_get_path('module', 'openfema');
+
+    // pass data to javascript
+    $add_js = array();
+    $add_js['openfema'] = array('data_path' => $path.'/data/');
+
+    drupal_add_js($add_js, 'setting');
+
+    // needed for D3, advanced sliders etc.
+    drupal_add_library('addlibraries','d3.v3');
+    drupal_add_library('addlibraries','jQueryUI_1.9');
+
+    drupal_add_css($path.'/css/ky_zip.css');
+    drupal_add_js($path.'/js/ky_zip.js',   array('scope' => 'footer'));
+
+    $content = file_get_contents($path.'/html/ky_zip.html');
 
     return $content;
 }
