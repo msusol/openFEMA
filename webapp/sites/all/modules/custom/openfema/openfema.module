@@ -8,8 +8,8 @@ function openfema_init () {
 function openfema_menu () {
 
     $items['vis_1'] = array(
-        'title' => 'Fire Data Chlorepeth',
-        'page callback' => 'openfema_chlorepeth',
+        'title' => 'Fire Data chloropeth',
+        'page callback' => 'openfema_chloropeth',
         'access callback' => TRUE,
         'type' => MENU_NORMAL_ITEM
     );
@@ -31,7 +31,7 @@ function openfema_menu () {
     return $items;
 }
 
-function openfema_chlorepeth() {
+function openfema_chloropeth() {
 
     $path = drupal_get_path('module', 'openfema');
 
@@ -45,10 +45,10 @@ function openfema_chlorepeth() {
     drupal_add_library('addlibraries','d3.v3');
     drupal_add_library('addlibraries','jQueryUI_1.9');
 
-    drupal_add_css($path.'/css/chlorepeth.css');
-    drupal_add_js($path.'/js/chlorepeth.js',   array('scope' => 'footer'));
+    drupal_add_css($path.'/css/chloropeth.css');
+    drupal_add_js($path.'/js/chloropeth.js',   array('scope' => 'footer'));
 
-    $content = file_get_contents($path.'/html/chlorepeth.html');
+    $content = file_get_contents($path.'/html/chloropeth.html');
 
     return $content;
 }
