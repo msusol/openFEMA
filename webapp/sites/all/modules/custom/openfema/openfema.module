@@ -11,14 +11,14 @@ function openfema_menu () {
         'title' => 'Fire Data chloropeth',
         'page callback' => 'openfema_chloropeth',
         'access callback' => TRUE,
-        'type' => MENU_NORMAL_ITEM
+        'type' => MENU_CALLBACK
     );
 
     $items['vis_2'] = array(
         'title' => 'Basic Bar',
         'page callback' => 'openfema_basic_bar',
         'access callback' => TRUE,
-        'type' => MENU_NORMAL_ITEM
+        'type' => MENU_CALLBACK
     );
 
     $items['vis_3'] = array(
@@ -26,6 +26,13 @@ function openfema_menu () {
         'page callback' => 'openfema_ky_zip',
         'access callback' => TRUE,
         'type' => MENU_NORMAL_ITEM
+    );
+
+    $items['query'] = array(
+        'title' => 'KY Zip Query',
+        'page callback' => 'openfema_zip_query',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK
     );
 
     return $items;
@@ -48,9 +55,13 @@ function openfema_chloropeth() {
     drupal_add_css($path.'/css/chloropeth.css');
     drupal_add_js($path.'/js/chloropeth.js',   array('scope' => 'footer'));
 
-    $content = file_get_contents($path.'/html/chloropeth.html');
+    $output = '
+        <div align="center" style="width:860px">
+        <h2> Chloropeth</h2>
+        </div>
+        <container></container>';
 
-    return $content;
+    return $output;
 }
 
 function openfema_basic_bar() {
@@ -70,9 +81,13 @@ function openfema_basic_bar() {
     drupal_add_css($path.'/css/basicbar.css');
     drupal_add_js($path.'/js/basicbar.js',   array('scope' => 'footer'));
 
-    $content = file_get_contents($path.'/html/basicbar.html');
+    $output = '
+        <div align="center" style="width:860px">
+        <h2> Basic bar</h2>
+        </div>
+        <container></container>';
 
-    return $content;
+    return $output;
 }
 
 function openfema_ky_zip() {
@@ -81,18 +96,97 @@ function openfema_ky_zip() {
 
     // pass data to javascript
     $add_js = array();
-    $add_js['openfema'] = array('data_path' => $path.'/data/');
+    $add_js['openfema'] = array(
+        'data_path' => $path.'/data/',
+        'data'      => openfema_zip_query()
+    );
 
     drupal_add_js($add_js, 'setting');
 
     // needed for D3, advanced sliders etc.
     drupal_add_library('addlibraries','d3.v3');
-    drupal_add_library('addlibraries','jQueryUI_1.9');
+    //drupal_add_library('addlibraries','jQueryUI_1.9');
 
     drupal_add_css($path.'/css/ky_zip.css');
     drupal_add_js($path.'/js/ky_zip.js',   array('scope' => 'footer'));
 
-    $content = file_get_contents($path.'/html/ky_zip.html');
+    $output = '
+        <div align="center" style="width:860px">
+        <h2> Fire Rate in KY by zipcode</h2>
+        </div>
+        <div id="geo-map" align="center" style="width:860px"></div>';
 
-    return $content;
+    return $output;
+}
+
+function openfema_zip_query() {
+
+    // Submit those variables to the server
+    $query = array(
+        'state' => $_GET['state'],
+        'zips'  => $_GET['zips']
+    );
+
+    $query['fields'] = array();
+    $query['fields'][] = 'zip';
+    $query['fields'][] = 'county';
+    $query['fields'][] = 'state';
+    $query['fields'][] = 'estimated_population';
+    $query['fields'][] = 'TotalFires';
+    $query['fields'][] = 'FiresOther';
+    $query['fields'][] = 'StructureFires';
+    $query['fields'][] = 'MobilPropAsStructFires';
+    $query['fields'][] = 'VehicleFires';
+    $query['fields'][] = 'NatVegitationFires';
+    $query['fields'][] = 'OutsideRubbishFires';
+    $query['fields'][] = 'SpecialOutsideFires';
+    $query['fields'][] = 'CropFires';
+
+    if(0) {
+        $query['zips']     = array('40003','40865','41014');
+    }
+
+    $table = 'firedata.Analysis_Fires_by_Zip_by_Type';
+
+    if ( $query['fields'] ) {
+        $fields = implode(", ", $query['fields']);
+    } else {
+        $fields = '*';
+    }
+
+    if( $query['state'] ){
+        $state = "'".$query['state']."'";
+    } else {
+        $state  = "'KY'";
+    }
+
+    if ( $query['zips'] ){
+        $zips   = "'".implode("','",$query['zips'])."'";
+        $result = db_query('SELECT '.$fields.' FROM '.$table.' WHERE zip IN ('.$zips.') AND state = '.$state, array());
+    } else {
+        $result = db_query('SELECT '.$fields.' FROM '.$table.' WHERE state = '.$state, array());
+    }
+
+    $data = array();
+
+    foreach ($result as $record) {
+        $zip = "'".$record->zip."'";
+
+        $geo = db_query('SELECT primary_city, latitude, longitude FROM firedata.zip_code_database  WHERE zip = '.$zip)->fetchObject();
+
+        $feature = array();
+        $feature['type'] = 'Feature';
+        $feature['geometry'] = array();
+        $feature['geometry']['type'] = "Point";
+        $feature['geometry']['coordinates'] = array($geo->longitude,$geo->latitude);
+
+        $feature['properties'] = array();
+        $feature['properties']['name']       = $record->state;
+        $feature['properties']['label']      = $geo->primary_city.' ('.$record->zip.')';
+        $feature['properties']['totalFires'] = $record->TotalFires;
+
+        $data[] = $feature;
+    }
+
+    return $data;
 }
