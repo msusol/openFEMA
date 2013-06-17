@@ -15,10 +15,10 @@ function openfema_menu () {
     );
 
     $items['vis_2'] = array(
-        'title' => 'Basic Bar',
-        'page callback' => 'openfema_basic_bar',
+        'title' => 'US Zip',
+        'page callback' => 'openfema_us_zip',
         'access callback' => TRUE,
-        'type' => MENU_CALLBACK
+        'type' => MENU_NORMAL_ITEM
     );
 
     $items['vis_3'] = array(
@@ -64,41 +64,17 @@ function openfema_chloropeth() {
     return $output;
 }
 
-function openfema_basic_bar() {
+function openfema_us_zip() {
 
     $path = drupal_get_path('module', 'openfema');
 
-    // pass data to javascript
-    $add_js = array();
-    $add_js['openfema'] = array('data_path' => $path.'/data/');
-
-    drupal_add_js($add_js, 'setting');
-
-    // needed for D3, advanced sliders etc.
-    drupal_add_library('addlibraries','d3.v3');
-    drupal_add_library('addlibraries','jQueryUI_1.9');
-
-    drupal_add_css($path.'/css/basicbar.css');
-    drupal_add_js($path.'/js/basicbar.js',   array('scope' => 'footer'));
-
-    $output = '
-        <div align="center" style="width:860px">
-        <h2> Basic bar</h2>
-        </div>
-        <container></container>';
-
-    return $output;
-}
-
-function openfema_ky_zip() {
-
-    $path = drupal_get_path('module', 'openfema');
+    $query = array();
 
     // pass data to javascript
     $add_js = array();
     $add_js['openfema'] = array(
         'data_path' => $path.'/data/',
-        'data'      => openfema_zip_query()
+        'data'      => openfema_zip_query($query)
     );
 
     drupal_add_js($add_js, 'setting');
@@ -107,25 +83,58 @@ function openfema_ky_zip() {
     drupal_add_library('addlibraries','d3.v3');
     //drupal_add_library('addlibraries','jQueryUI_1.9');
 
-    drupal_add_css($path.'/css/ky_zip.css');
-    drupal_add_js($path.'/js/ky_zip.js',   array('scope' => 'footer'));
+    drupal_add_css($path.'/css/zip.css');
+    drupal_add_js($path.'/js/us_zip.js',   array('scope' => 'footer'));
 
     $output = '
         <div align="center" style="width:860px">
-        <h2> Fire Rate in KY by zipcode</h2>
+        <h2>Fire Rate in US by zipcode</h2>
         </div>
         <div id="geo-map" align="center" style="width:860px"></div>';
 
     return $output;
 }
 
-function openfema_zip_query() {
+function openfema_ky_zip() {
+
+    $path = drupal_get_path('module', 'openfema');
+
+    $query = array();
+    $query['state'] = 'KY';
+    //$query['zips']  = array('40003','40865','41014');
+
+    // pass data to javascript
+    $add_js = array();
+    $add_js['openfema'] = array(
+        'data_path' => $path.'/data/',
+        'data'      => openfema_zip_query($query)
+    );
+
+    drupal_add_js($add_js, 'setting');
+
+    // needed for D3, advanced sliders etc.
+    drupal_add_library('addlibraries','d3.v3');
+    //drupal_add_library('addlibraries','jQueryUI_1.9');
+
+    drupal_add_css($path.'/css/zip.css');
+    drupal_add_js($path.'/js/ky_zip.js',   array('scope' => 'footer'));
+
+    $output = '
+        <div align="center" style="width:860px">
+        <h2>Fire Rate in KY by zipcode</h2>
+        </div>
+        <div id="geo-map" align="center" style="width:860px"></div>';
+
+    return $output;
+}
+
+function openfema_zip_query( $query = array() ) {
 
     // Submit those variables to the server
-    $query = array(
-        'state' => $_GET['state'],
-        'zips'  => $_GET['zips']
-    );
+    if ( $_GET['state'] || $_GET['zips'] ) {
+        $query['state'] = $_GET['state'];
+        $query['zips'] = $_GET['zips'];
+    }
 
     $query['fields'] = array();
     $query['fields'][] = 'zip';
@@ -142,10 +151,6 @@ function openfema_zip_query() {
     $query['fields'][] = 'SpecialOutsideFires';
     $query['fields'][] = 'CropFires';
 
-    if(0) {
-        $query['zips']     = array('40003','40865','41014');
-    }
-
     $table = 'firedata.Analysis_Fires_by_Zip_by_Type';
 
     if ( $query['fields'] ) {
@@ -156,15 +161,15 @@ function openfema_zip_query() {
 
     if( $query['state'] ){
         $state = "'".$query['state']."'";
-    } else {
-        $state  = "'KY'";
     }
 
-    if ( $query['zips'] ){
+    if ( $query['zips'] && $query['state'] ){
         $zips   = "'".implode("','",$query['zips'])."'";
         $result = db_query('SELECT '.$fields.' FROM '.$table.' WHERE zip IN ('.$zips.') AND state = '.$state, array());
-    } else {
+    } elseif ( $query['state'] ) {
         $result = db_query('SELECT '.$fields.' FROM '.$table.' WHERE state = '.$state, array());
+    } else {
+        $result = db_query('SELECT '.$fields.' FROM '.$table.' ', array());
     }
 
     $data = array();
