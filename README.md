@@ -1,5 +1,7 @@
 openFEMA
 ========
+Plot 1: US Fire Data Visualization by Zipcode
+![plot of us_by_zip.tiff](https://github.com/msusol/openFEMA/blob/master/screenshots/us_by_zip.tiff) 
 
 FIRE DATA VISUALIZATION
 http://hackforchange.org/challenge/fire-data-visualization
